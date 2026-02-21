@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from src.ai_detector import AIDetector
 
+# Tipos de ataque e nível base
 ATTACK_TYPES = {
     "Tentativa de login inválido": 1,
     "IP desconhecido detectado": 2,
@@ -11,24 +12,32 @@ ATTACK_TYPES = {
     "Ataque de força bruta": 5
 }
 
+# Inicializa detector
 detector = AIDetector()
+
 
 def gerar_evento():
     ataque = random.choice(list(ATTACK_TYPES.keys()))
-    nivel = ATTACK_TYPES[ataque]
+    nivel_base = ATTACK_TYPES[ataque]
 
-    detector.registrar(nivel)
+    # Score dinâmico de risco
+    fator = random.randint(1, 3)
+    score = nivel_base * fator
 
-    anomalia, motivo = detector.detectar_anomalia(nivel)
+    # Registra no modelo
+    detector.registrar(score)
+
+    # Detecta anomalia
+    anomalia, motivo = detector.detectar_anomalia(score)
 
     horario = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if anomalia:
-        alerta = f" ⚠️ ANOMALIA: {motivo}"
+        alerta = f"⚠️ RISCO ALTO ({score}) - {motivo}"
     else:
-        alerta = ""
+        alerta = f"RISCO {score}"
 
-    evento = f"[{horario}] {ataque} | NIVEL {nivel}{alerta}"
+    evento = f"[{horario}] {ataque} | {alerta}"
 
     return evento
 
@@ -40,14 +49,16 @@ def salvar_log(evento):
 
 def main():
     print("VigilIA + IA iniciado...\n")
+    print("Monitoramento Inteligente Ativo\n")
 
-    for i in range(20):
+    for _ in range(25):
         evento = gerar_evento()
         print(evento)
         salvar_log(evento)
         time.sleep(1)
 
     print("\nMonitoramento finalizado.")
+    print("Logs salvos em logs/seguranca.log")
 
 
 if __name__ == "__main__":
