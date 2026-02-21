@@ -1,200 +1,172 @@
 import os
+import requests
 from datetime import datetime
-from flask import Flask, request, redirect, session, render_template_string
+from flask import Flask,request,redirect,session,render_template_string
 
 from db import criar_tabelas
-from auth import criar_usuario, validar_login, buscar_usuario
+from auth import criar_usuario,validar,buscar
+from api import api
 
-app = Flask(__name__)
-app.secret_key = "rovie-secure-2026"
+
+app=Flask(__name__)
+app.secret_key="rovie-enterprise"
+
+app.register_blueprint(api)
 
 criar_tabelas()
 
-LOG = "logs/seguranca.log"
+LOG="logs/seguranca.log"
 
 
 # ================= HTML =================
 
-LOGIN_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-<title>Rovie IA</title>
-<style>
-
-body{
-background:#020617;
-color:white;
-font-family:Arial;
-text-align:center;
-}
-
-.box{
-background:#081a33;
-width:330px;
-margin:80px auto;
-padding:30px;
-border-radius:14px;
-box-shadow:0 0 25px #38bdf8;
-}
-
-input{
-width:90%;
-padding:12px;
-border-radius:8px;
-border:none;
-margin:8px;
-}
-
-button{
-background:#38bdf8;
-border:none;
-padding:12px;
-width:95%;
-border-radius:8px;
-font-size:16px;
-}
-
-a{color:#38bdf8;text-decoration:none;}
-
-</style>
-</head>
-
-<body>
-
-<div class="box">
-
+LOGIN="""
 <h2>🔐 Rovie IA</h2>
 
-<form method="post">
+<form method=post>
 
-<input name="user" placeholder="Usuário">
-<input name="senha" type="password" placeholder="Senha">
+<input name=user placeholder=Usuário><br>
+<input name=senha type=password placeholder=Senha><br>
 
 <button>Entrar</button>
 
 </form>
 
-<a href="/register">Criar conta</a>
+<a href=/register>Cadastrar</a>
 
-<p style="color:red">{{erro}}</p>
-
-</div>
-</body>
-</html>
+<p style=color:red>{{e}}</p>
 """
 
 
-DASH_HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-<title>Rovie IA</title>
-<style>
+ADMIN="""
+<h2>👑 Painel Admin</h2>
 
-body{background:#020617;color:white;font-family:Arial;}
+<p>Usuário: {{u}}</p>
 
-header{
-background:#020f2f;
-padding:20px;
-text-align:center;
-}
+<a href=/dashboard>Dashboard</a> |
+<a href=/logout>Sair</a>
 
-.card{
-background:#081a33;
-margin:10px;
-padding:12px;
-border-radius:10px;
-}
+<hr>
 
-.alto{border-left:6px solid red;}
-.medio{border-left:6px solid orange;}
-.baixo{border-left:6px solid green;}
+<h3>📊 Ranking de Ataques</h3>
 
-</style>
-</head>
-
-<body>
-
-<header>
-<h2>🛡️ Rovie IA</h2>
-<p>Usuário: {{user}}</p>
-<p>IP: {{ip}}</p>
-<a href="/logout">Sair</a>
-</header>
-
-{% for l in logs %}
-
-<div class="card
-{% if "ALTO" in l %}alto
-{% elif "MÉDIO" in l %}medio
-{% else %}baixo{% endif %}">
-
-{{l}}
-
-</div>
-
+{% for ip,c in rank %}
+<p>{{ip}} → {{c}} ataques</p>
 {% endfor %}
 
-</body>
-</html>
+<hr>
+
+<h3>🌍 Mapa IP (Geo)</h3>
+
+{% for ip,pais in geo %}
+<p>{{ip}} → {{pais}}</p>
+{% endfor %}
 """
+
+
+DASH="""
+<h2>🛡️ Dashboard</h2>
+
+<p>User: {{u}}</p>
+<p>IP: {{ip}}</p>
+
+<a href=/admin>Admin</a> |
+<a href=/logout>Sair</a>
+
+<hr>
+
+{% for l in logs %}
+<p>{{l}}</p>
+{% endfor %}
+"""
+
+
+# ================= FUNÇÕES =================
+
+def logar(txt):
+
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
+
+    with open(LOG,"a") as f:
+        f.write(txt+"\n")
+
+
+def ranking():
+
+    ips={}
+
+    if os.path.exists(LOG):
+
+        with open(LOG) as f:
+
+            for l in f:
+
+                if "IP:" in l:
+
+                    ip=l.split("IP:")[1].split()[0]
+
+                    ips[ip]=ips.get(ip,0)+1
+
+    return sorted(ips.items(),key=lambda x:x[1],reverse=True)
+
+
+def geo_ip(ip):
+
+    try:
+        r=requests.get(f"http://ip-api.com/json/{ip}").json()
+        return r.get("country","?")
+    except:
+        return "?"
+
 
 # ================= ROTAS =================
 
 
-@app.route("/", methods=["GET","POST"])
+@app.route("/",methods=["GET","POST"])
 def login():
 
-    erro=""
+    e=""
 
     if request.method=="POST":
 
-        u = request.form["user"]
-        s = request.form["senha"]
+        u=request.form["user"]
+        s=request.form["senha"]
 
-        ip = request.remote_addr
-        hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ip=request.remote_addr
+        h=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        status = validar_login(u,s)
+        r=validar(u,s)
 
-        if status=="OK":
+        if r=="OK":
 
-            session["user"]=u
+            session["u"]=u
             session["ip"]=ip
 
-            log = f"[{hora}] Login autorizado | User:{u} | IP:{ip} | BAIXO"
+            logar(f"[{h}] Login OK | {u} | IP:{ip} | BAIXO")
 
-        elif status=="BLOQUEADO":
+            return redirect("/dashboard")
 
-            erro="Conta bloqueada por tentativas"
+        if r=="BLOCK":
 
-            log = f"[{hora}] Login bloqueado | User:{u} | IP:{ip} | ALTO"
+            e="Bloqueado"
+
+            logar(f"[{h}] Bloqueado | {u} | IP:{ip} | ALTO")
 
         else:
 
-            erro="Senha inválida"
+            e="Erro"
 
-            log = f"[{hora}] Login inválido | User:{u} | IP:{ip} | ALTO"
-
-
-        if not os.path.exists("logs"):
-            os.mkdir("logs")
-
-        with open(LOG,"a") as f:
-            f.write(log+"\n")
-
-        if status=="OK":
-            return redirect("/dashboard")
+            logar(f"[{h}] Erro login | {u} | IP:{ip} | ALTO")
 
 
-    return render_template_string(LOGIN_HTML,erro=erro)
+    return render_template_string(LOGIN,e=e)
 
 
 @app.route("/register",methods=["GET","POST"])
-def register():
+def reg():
 
-    erro=""
+    e=""
 
     if request.method=="POST":
 
@@ -204,19 +176,15 @@ def register():
         if criar_usuario(u,s):
             return redirect("/")
 
-        else:
-            erro="Usuário já existe"
+        e="Existe"
 
-    return render_template_string(
-        LOGIN_HTML.replace("Entrar","Cadastrar"),
-        erro=erro
-    )
+    return render_template_string(LOGIN.replace("Entrar","Cadastrar"),e=e)
 
 
 @app.route("/dashboard")
-def dashboard():
+def dash():
 
-    if "user" not in session:
+    if "u" not in session:
         return redirect("/")
 
     logs=[]
@@ -224,18 +192,44 @@ def dashboard():
     if os.path.exists(LOG):
 
         with open(LOG) as f:
-            logs=f.readlines()[-50:]
+            logs=f.readlines()[-40:]
 
     return render_template_string(
-        DASH_HTML,
-        logs=logs[::-1],
-        user=session["user"],
-        ip=session["ip"]
+        DASH,
+        u=session["u"],
+        ip=session["ip"],
+        logs=logs[::-1]
+    )
+
+
+@app.route("/admin")
+def admin():
+
+    if "u" not in session:
+        return redirect("/")
+
+    user=buscar(session["u"])
+
+    if not user or user[5]!=1:
+        return "Acesso negado"
+
+    rank=ranking()[:10]
+
+    geo=[]
+
+    for ip,_ in rank:
+        geo.append((ip,geo_ip(ip)))
+
+    return render_template_string(
+        ADMIN,
+        u=session["u"],
+        rank=rank,
+        geo=geo
     )
 
 
 @app.route("/logout")
-def logout():
+def out():
 
     session.clear()
     return redirect("/")
