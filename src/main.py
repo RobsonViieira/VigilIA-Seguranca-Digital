@@ -1,21 +1,54 @@
-import argparse
-from src.ingestao import carregar_logs
-from src.analisador import detectar_ips_suspeitos
-from src.alerta import gerar_alertas
+import random
+import time
+from datetime import datetime
+from src.ai_detector import AIDetector
 
-def run(caminho_log, limite_alerta=3):
-    print(f"[INFO] Lendo log de: {caminho_log}")
-    df = carregar_logs(caminho_log)
+ATTACK_TYPES = {
+    "Tentativa de login inválido": 1,
+    "IP desconhecido detectado": 2,
+    "Acesso não autorizado": 3,
+    "Transferência suspeita": 4,
+    "Ataque de força bruta": 5
+}
 
-    print(f"[INFO] Analisando IPs com mais de {limite_alerta} bloqueios...")
-    suspeitos = detectar_ips_suspeitos(df, limite=limite_alerta)
+detector = AIDetector()
 
-    gerar_alertas(suspeitos)
+def gerar_evento():
+    ataque = random.choice(list(ATTACK_TYPES.keys()))
+    nivel = ATTACK_TYPES[ataque]
+
+    detector.registrar(nivel)
+
+    anomalia, motivo = detector.detectar_anomalia(nivel)
+
+    horario = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    if anomalia:
+        alerta = f" ⚠️ ANOMALIA: {motivo}"
+    else:
+        alerta = ""
+
+    evento = f"[{horario}] {ataque} | NIVEL {nivel}{alerta}"
+
+    return evento
+
+
+def salvar_log(evento):
+    with open("logs/seguranca.log", "a") as file:
+        file.write(evento + "\n")
+
+
+def main():
+    print("VigilIA + IA iniciado...\n")
+
+    for i in range(20):
+        evento = gerar_evento()
+        print(evento)
+        salvar_log(evento)
+        time.sleep(1)
+
+    print("\nMonitoramento finalizado.")
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Pipeline de análise de segurança")
-    parser.add_argument("--input", required=True, help="Caminho para o arquivo de log")
-    parser.add_argument("--limite", type=int, default=3, help="Limite de bloqueios para alerta")
-    args = parser.parse_args()
-
-    run(args.input, args.l
+    main()
