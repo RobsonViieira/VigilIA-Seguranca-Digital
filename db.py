@@ -2,7 +2,6 @@ import sqlite3
 
 DB = "users.db"
 
-
 def conectar():
     return sqlite3.connect(DB)
 
@@ -18,7 +17,8 @@ def criar_tabelas():
         username TEXT UNIQUE,
         password TEXT,
         tentativas INTEGER DEFAULT 0,
-        bloqueado_ate TEXT
+        bloqueado_ate TEXT,
+        admin INTEGER DEFAULT 0
     )
     """)
 
