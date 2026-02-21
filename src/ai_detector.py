@@ -1,10 +1,11 @@
 import statistics
+from collections import deque
 
 class AIDetector:
 
     def __init__(self):
-        self.valores = []
-        self.min_dados = 15  # mínimo pra começar a analisar
+        self.valores = deque(maxlen=50)  # guarda só os últimos 50
+        self.min_dados = 20
 
     def registrar(self, valor):
         self.valores.append(valor)
@@ -12,15 +13,14 @@ class AIDetector:
     def detectar_anomalia(self, valor_atual):
 
         if len(self.valores) < self.min_dados:
-            return False, "Em fase de aprendizado"
+            return False, "Em treinamento"
 
         media = statistics.mean(self.valores)
         desvio = statistics.stdev(self.valores)
 
-        limite = media + (2 * desvio)
+        limite = media + (2.5 * desvio)  # mais tolerante
 
         if valor_atual > limite:
-            motivo = f"Acima do padrão (limite={limite:.2f})"
-            return True, motivo
+            return True, f"Fora do padrão (limite={limite:.2f})"
 
-        return False, "Comportamento normal"
+        return False, "Normal"
