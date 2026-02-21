@@ -7,46 +7,45 @@ from datetime import datetime
 
 def gerar_relatorio():
 
-    base = os.path.dirname(os.path.abspath(__file__))
-    log_path = os.path.join(base, "logs", "seguranca.log")
-    pdf_path = os.path.join(base, "relatorio_rovia_ia.pdf")
+    base=os.path.dirname(os.path.abspath(__file__))
+    log_path=os.path.join(base,"logs","seguranca.log")
+    pdf=os.path.join(base,"relatorio_rovia_ia.pdf")
 
-    doc = SimpleDocTemplate(pdf_path, pagesize=A4)
-    styles = getSampleStyleSheet()
-    elementos = []
+    doc=SimpleDocTemplate(pdf,pagesize=A4)
+    styles=getSampleStyleSheet()
+    itens=[]
 
-    elementos.append(Paragraph("<b>Rovie IA - Relatório de Segurança</b>", styles["Title"]))
-    elementos.append(Spacer(1, 20))
+    itens.append(Paragraph("Rovie IA - Relatório de Segurança",styles["Title"]))
+    itens.append(Spacer(1,20))
 
-    data = datetime.now().strftime("%d/%m/%Y %H:%M")
-    elementos.append(Paragraph(f"Gerado em: {data}", styles["Normal"]))
-    elementos.append(Spacer(1, 20))
+    data=datetime.now().strftime("%d/%m/%Y %H:%M")
+    itens.append(Paragraph(f"Gerado em: {data}",styles["Normal"]))
+    itens.append(Spacer(1,20))
 
-    baixo = medio = alto = 0
+    baixo=medio=alto=0
 
     if os.path.exists(log_path):
+
         with open(log_path) as f:
-            linhas = f.readlines()[-50:]
+            linhas=f.readlines()
 
         for l in linhas:
-            if "BAIXO" in l:
-                baixo += 1
-            elif "MÉDIO" in l:
-                medio += 1
-            elif "ALTO" in l:
-                alto += 1
+            if "ALTO" in l: alto+=1
+            elif "MÉDIO" in l: medio+=1
+            else: baixo+=1
 
-    elementos.append(Paragraph("<b>Resumo Executivo:</b>", styles["Heading2"]))
-    elementos.append(Spacer(1, 10))
-    elementos.append(Paragraph(f"Eventos Baixo Risco: {baixo}", styles["Normal"]))
-    elementos.append(Paragraph(f"Eventos Médio Risco: {medio}", styles["Normal"]))
-    elementos.append(Paragraph(f"Eventos Alto Risco: {alto}", styles["Normal"]))
-    elementos.append(Spacer(1, 20))
+    itens.append(Paragraph("Resumo Executivo",styles["Heading2"]))
+    itens.append(Spacer(1,10))
 
-    doc.build(elementos)
+    itens.append(Paragraph(f"Baixo: {baixo}",styles["Normal"]))
+    itens.append(Paragraph(f"Médio: {medio}",styles["Normal"]))
+    itens.append(Paragraph(f"Alto: {alto}",styles["Normal"]))
+    itens.append(Spacer(1,20))
 
-    return pdf_path
+    doc.build(itens)
+
+    return pdf
 
 
-if __name__ == "__main__":
+if __name__=="__main__":
     gerar_relatorio()
