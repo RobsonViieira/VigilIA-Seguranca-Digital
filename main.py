@@ -10,6 +10,12 @@ ATTACK_TYPES = {
     "Ataque de força bruta": 5
 }
 
+estatisticas = {
+    "BAIXO": 0,
+    "MÉDIO": 0,
+    "CRÍTICO": 0
+}
+
 def gerar_evento():
     ataque = random.choice(list(ATTACK_TYPES.keys()))
     nivel = ATTACK_TYPES[ataque]
@@ -22,6 +28,8 @@ def gerar_evento():
     else:
         risco = "CRÍTICO"
 
+    estatisticas[risco] += 1
+
     evento = f"[{horario}] ALERTA: {ataque} | RISCO: {risco}"
     return evento
 
@@ -31,18 +39,43 @@ def salvar_log(evento):
         file.write(evento + "\n")
 
 
+def gerar_relatorio():
+    relatorio = "\n===== RELATÓRIO FINAL =====\n"
+    total = sum(estatisticas.values())
+
+    for nivel, qtd in estatisticas.items():
+        relatorio += f"{nivel}: {qtd} eventos\n"
+
+    relatorio += f"Total: {total} eventos\n"
+    relatorio += "Status: "
+
+    if estatisticas["CRÍTICO"] > 2:
+        relatorio += "RISCO ALTO\n"
+    elif estatisticas["MÉDIO"] > 3:
+        relatorio += "RISCO MODERADO\n"
+    else:
+        relatorio += "SISTEMA ESTÁVEL\n"
+
+    return relatorio
+
+
 def main():
     print("VigilIA iniciado...")
-    print("Sistema Inteligente de Monitoramento\n")
+    print("Monitoramento Inteligente Ativo\n")
 
-    for i in range(10):
+    for i in range(15):
         evento = gerar_evento()
         print(evento)
         salvar_log(evento)
         time.sleep(1)
 
-    print("\nSimulação finalizada.")
-    print("Logs salvos com classificação de risco.")
+    relatorio = gerar_relatorio()
+    print(relatorio)
+
+    with open("logs/relatorio.txt", "w") as file:
+        file.write(relatorio)
+
+    print("Relatório salvo em logs/relatorio.txt")
 
 
 if __name__ == "__main__":
