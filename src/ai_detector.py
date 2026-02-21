@@ -11,7 +11,7 @@ class AIDetector:
     def detectar_anomalia(self, valor_atual):
 
         if len(self.valores) < 5:
-            return False  # Poucos dados ainda
+            return False, "Dados insuficientes"
 
         media = statistics.mean(self.valores)
         desvio = statistics.stdev(self.valores)
@@ -19,6 +19,7 @@ class AIDetector:
         limite = media + (2 * desvio)
 
         if valor_atual > limite:
-            return True
+            motivo = f"Valor acima do padrão (limite={limite:.2f})"
+            return True, motivo
 
-        return False
+        return False, "Dentro do padrão"
