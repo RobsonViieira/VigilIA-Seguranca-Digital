@@ -100,4 +100,4 @@ Projeto em desenvolvimento.
 ## 👤 Autor
 
 Robson Vieira
-Intusiasta de Tecnologia | Segurança Digital | IA
+Entusiasta de Tecnologia | Segurança Digital | IA
