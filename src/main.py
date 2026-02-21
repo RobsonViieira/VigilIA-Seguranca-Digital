@@ -20,9 +20,8 @@ def gerar_evento():
     ataque = random.choice(list(ATTACK_TYPES.keys()))
     nivel_base = ATTACK_TYPES[ataque]
 
-    # Score dinâmico de risco
-    fator = random.randint(1, 3)
-    score = nivel_base * fator
+    # Score suave (variação pequena)
+    score = nivel_base + random.uniform(-0.5, 0.5)
 
     # Registra no modelo
     detector.registrar(score)
@@ -33,9 +32,9 @@ def gerar_evento():
     horario = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if anomalia:
-        alerta = f"⚠️ RISCO ALTO ({score}) - {motivo}"
+        alerta = f"⚠️ RISCO ALTO ({score:.2f}) - {motivo}"
     else:
-        alerta = f"RISCO {score}"
+        alerta = f"RISCO {score:.2f}"
 
     evento = f"[{horario}] {ataque} | {alerta}"
 
@@ -51,7 +50,7 @@ def main():
     print("VigilIA + IA iniciado...\n")
     print("Monitoramento Inteligente Ativo\n")
 
-    for _ in range(25):
+    for _ in range(30):
         evento = gerar_evento()
         print(evento)
         salvar_log(evento)
