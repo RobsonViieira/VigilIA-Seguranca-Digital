@@ -1,39 +1,90 @@
-# VigilIA – Agente de Segurança Digital com IA
+# 🔐 VigilIA — Segurança Digital com Inteligência Artificial
 
-## Descrição
+VigilIA é um projeto de simulação voltado para o estudo, análise e prevenção de ataques digitais em sistemas financeiros e plataformas online.
 
-VigilIA é um agente inteligente para análise automatizada de logs de firewall, capaz de detectar comportamentos suspeitos de IPs e gerar alertas em tempo real. Desenvolvido em Python com foco em modularidade e fácil expansão.
+O objetivo é criar ambientes controlados para testar vulnerabilidades, compreender padrões de fraude e desenvolver soluções automatizadas com apoio de Inteligência Artificial.
 
-## Funcionalidades
+---
 
-- Leitura e parse de logs de firewall
-- Identificação de IPs com múltiplos bloqueios
-- Geração de alertas no console (com opção de integração Telegram)
-- Pipeline simples e extensível para análise de segurança
+## 🚀 Objetivos
 
-## Tecnologias
+- Simular ataques digitais em ambiente seguro
+- Analisar comportamentos suspeitos
+- Estudar falhas em sistemas financeiros
+- Apoiar pesquisas e projetos educacionais
+- Desenvolver mecanismos de prevenção
 
-- Python 3.x  
-- pandas  
-- requests (para integração Telegram)
+---
 
-## Estrutura do projeto
+## 🧠 Funcionalidades
 
-## Como usar
+- Simulação de tentativas de invasão
+- Registro de eventos de segurança
+- Monitoramento de atividades
+- Análise automatizada
+- Geração de relatórios
 
-1. Clone o repositório  
-2. Instale dependências:  
-   `pip install -r requirements.txt`  
-3. Configure variáveis de ambiente para alertas Telegram (opcional)  
-4. Execute o pipeline:  
-   `python src/main.py --input logs/firewall.log --limite 3`
+---
 
-## Contribuições
+## 🛠️ Tecnologias
 
-Pull requests são bem-vindos! Abra issues para sugestões e bugs.
+- Python
+- Ferramentas de simulação
+- Bibliotecas de análise de dados
+- (Em evolução)
 
-## Contato
+---
 
-Robson Vieira - roviemealclube@gmail.com
-LinkedIn: [Robson Vieira]https://www.linkedin.com/in/robson-vieira94
-GitHub: [Robson Vieira](https://github.com/RobsonViieira)
+## 📂 Estrutura do Projeto
+
+VigilIA-Seguranca-Digital/
+│
+├── src/        # Código principal
+├── data/       # Dados simulados
+├── logs/       # Registros
+├── models/     # Modelos de IA
+├── tests/      # Testes
+└── main.py     # Arquivo principal
+
+---
+
+## ▶️ Como Executar
+
+1. Clone o repositório:
+
+   git clone https://github.com/RobsonViieira/VigilIA-Seguranca-Digital.git
+
+2. Acesse a pasta:
+
+   cd VigilIA-Seguranca-Digital
+
+3. Instale as dependências:
+
+   pip install -r requirements.txt
+
+4. Execute o sistema:
+
+   python main.py
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Organizar código-fonte
+- [ ] Criar módulos de ataque
+- [ ] Implementar alertas
+- [ ] Integrar modelos de IA
+- [ ] Desenvolver painel visual
+
+---
+
+## 📌 Status
+
+Projeto em desenvolvimento.
+
+---
+
+## 👤 Autor
+
+Robson Vieira
+Intusiasta de Tecnologia | Segurança Digital | IA
