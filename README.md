@@ -1,4 +1,4 @@
-# 🔐 VigilIA — Segurança Digital com Inteligência Artificial
+8# 🔐 VigilIA — Segurança Digital com Inteligência Artificial
 
 VigilIA é um projeto de simulação voltado para o estudo, análise e prevenção de ataques digitais em sistemas financeiros e plataformas online.
 
@@ -76,6 +76,19 @@ VigilIA-Seguranca-Digital/
 - [ ] Integrar modelos de IA
 - [ ] Desenvolver painel visual
 
+## 📊 Exemplo de Uso
+
+Ao executar o sistema, ele:
+
+- Simula tentativas de acesso
+- Registra eventos
+- Analisa padrões
+- Gera alertas
+
+Exemplo de saída:
+
+[ALERTA] Possível ataque detectado no IP 192.168.0.5
+Risco: Alto
 ---
 
 ## 📌 Status
